@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $this->createSuperAdmin();
-        $this->createHrUser();
+        $this->createTestOrganizationUsers();
     }
 
     private function createSuperAdmin()
@@ -30,20 +30,40 @@ class UserSeeder extends Seeder
         $user->assignRole('Super Admin');
     }
 
-    private function createHrUser()
+    private function createTestOrganizationUsers()
     {
         $organization = Organization::create([
             'name' => 'Test Organization',
             'slug' => Str::slug('Test Organization'),
         ]);
 
-        $user = User::create([
+        // HR User
+        $hrUser = User::create([
             'name' => 'HR User',
             'email' => 'hr@example.com',
             'password' => bcrypt('password'),
             'organization_id' => $organization->id,
         ]);
+        $hrUser->assignRole('HR');
 
-        $user->assignRole('HR');
+        // Manager User
+        $managerUser = User::create([
+            'name' => 'Manager User',
+            'email' => 'manager@example.com',
+            'password' => bcrypt('password'),
+            'organization_id' => $organization->id,
+        ]);
+        $managerUser->assignRole('Manager');
+
+        // Employee Users
+        for ($i = 1; $i <= 3; $i++) {
+            $employee = User::create([
+                'name' => 'Employee ' . $i,
+                'email' => 'employee' . $i . '@example.com',
+                'password' => bcrypt('password'),
+                'organization_id' => $organization->id,
+            ]);
+            $employee->assignRole('Employee');
+        }
     }
 }

@@ -15,6 +15,27 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.index')">
+                        {{ __('Attendance') }}
+                    </x-nav-link>
+                    @can('viewAny', App\Models\Attendance::class)
+                    <x-nav-link :href="route('attendances.list')" :active="request()->routeIs('attendances.list')">
+                        {{ __('Attendance Log') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('attendance.report')" :active="request()->routeIs('attendance.report')">
+                        {{ __('Attendance Report') }}
+                    </x-nav-link>
+                    @endcan
+                    @can('viewAny', App\Models\User::class)
+                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                        {{ __('User Management') }}
+                    </x-nav-link>
+                    @endcan
+                    @role('Super Admin')
+                    <x-nav-link :href="route('audit-log.index')" :active="request()->routeIs('audit-log.index')">
+                        {{ __('Audit Log') }}
+                    </x-nav-link>
+                    @endrole
                 </div>
             </div>
 
@@ -70,6 +91,27 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('attendance.index')" :active="request()->routeIs('attendance.index')">
+                {{ __('Attendance') }}
+            </x-responsive-nav-link>
+            @can('viewAny', App\Models\Attendance::class)
+            <x-responsive-nav-link :href="route('attendances.list')" :active="request()->routeIs('attendances.list')">
+                {{ __('Attendance Log') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('attendance.report')" :active="request()->routeIs('attendance.report')">
+                {{ __('Attendance Report') }}
+            </x-responsive-nav-link>
+            @endcan
+            @can('viewAny', App\Models\User::class)
+            <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                {{ __('User Management') }}
+            </x-responsive-nav-link>
+            @endcan
+            @role('Super Admin')
+            <x-responsive-nav-link :href="route('audit-log.index')" :active="request()->routeIs('audit-log.index')">
+                {{ __('Audit Log') }}
+            </x-responsive-nav-link>
+            @endrole
         </div>
 
         <!-- Responsive Settings Options -->
