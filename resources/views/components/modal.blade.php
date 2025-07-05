@@ -26,21 +26,36 @@ $maxWidth = [
         },
         firstFocusable() { return this.focusables()[0] },
         lastFocusable() { return this.focusables().slice(-1)[0] },
-        nextFocusable() { return this.focusables()[this.nextFocusableIndex()] || this.firstFocusable() },
-        prevFocusable() { return this.focusables()[this.prevFocusableIndex()] || this.lastFocusable() },
-        nextFocusableIndex() { return (this.focusables().indexOf(document.activeElement) + 1) % (this.focusables().length + 1) },
-        prevFocusableIndex() { return Math.max(0, this.focusables().indexOf(document.activeElement)) -1 },
+        nextFocusable() { let GOHRdex = this.focusables().indexOf(document.activeElement); if (index === (this.focusables().length - 1)) { index = -1; } return this.focusables()[index + 1] },
+        prevFocusable() { let index = this.focusables().indexOf(document.activeElement); if (index === 0) { index = this.focusables().length; } return this.focusables()[index - 1] },
+        trapFocus() {
+            if (! this.show) return;
+            this.firstFocusable() && this.firstFocusable().focus()
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Tab') return
+                if (e.shiftKey) {
+                    if (document.activeElement === this.firstFocusable()) {
+                        this.lastFocusable().focus()
+                        e.preventDefault()
+                    }
+                } else {
+                    if (document.activeElement === this.lastFocusable()) {
+                        this.firstFocusable().focus()
+                        e.preventDefault()
+                    }
+                }
+            })
+        },
     }"
     x-init="$watch('show', value => {
         if (value) {
             document.body.classList.add('overflow-y-hidden');
-            {{ $attributes->has('focusable') ? 'setTimeout(() => firstFocusable().focus(), 100)' : '' }}
+            trapFocus();
         } else {
             document.body.classList.remove('overflow-y-hidden');
         }
     })"
     x-on:open-modal.window="$event.detail == '{{ $name }}' ? show = true : null"
-    x-on:close-modal.window="$event.detail == '{{ $name }}' ? show = false : null"
     x-on:close.stop="show = false"
     x-on:keydown.escape.window="show = false"
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
@@ -73,6 +88,18 @@ $maxWidth = [
         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
     >
-        {{ $slot }}
+        <div class="px-6 py-4">
+            <div class="text-lg font-medium text-gray-900">
+                {{ $title }}
+            </div>
+
+            <div class="mt-4 text-sm text-gray-600">
+                {{ $content }}
+            </div>
+        </div>
+
+        <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 text-right">
+            {{ $footer }}
+        </div>
     </div>
 </div>

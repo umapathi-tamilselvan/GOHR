@@ -65,6 +65,24 @@ class User extends Authenticatable
         return $this->organization_id;
     }
 
+    public function getPrimaryRoleAttribute()
+    {
+        $roles = $this->getRoleNames();
+        $order = ['Super Admin', 'HR', 'Manager', 'Employee'];
+
+        if ($roles->isEmpty()) {
+            return null;
+        }
+
+        foreach ($order as $role) {
+            if ($roles->contains($role)) {
+                return $role;
+            }
+        }
+
+        return $roles->first();
+    }
+
     /**
      * The "booted" method of the model.
      */
