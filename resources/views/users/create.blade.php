@@ -55,6 +55,25 @@
                             </select>
                         </div>
 
+                        <div class="mb-4">
+                            <label for="designation_id" class="block text-sm font-medium text-gray-700">Designation</label>
+                            <select name="designation_id" id="designation_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                <option value="">Select Designation</option>
+                                @foreach($designations as $designation)
+                                    <option value="{{ $designation->id }}">{{ $designation->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="projects" class="block text-sm font-medium text-gray-700">Projects</label>
+                            <select name="projects[]" id="projects" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                @foreach($projects as $project)
+                                    <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="flex items-center justify-end mt-4">
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                                 {{ __('Create') }}

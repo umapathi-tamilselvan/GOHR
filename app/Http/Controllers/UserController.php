@@ -7,6 +7,8 @@ use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use App\Models\Designation;
+use App\Models\Project;
 
 class UserController extends Controller
 {
@@ -37,8 +39,10 @@ class UserController extends Controller
         $user = Auth::user();
         $organizations = $user->hasRole('Super Admin') ? Organization::all() : Organization::where('id', $user->organization_id)->get();
         $roles = Role::pluck('name', 'id');
+        $designations = Designation::all();
+        $projects = Project::all();
 
-        return view('users.create', compact('user', 'organizations', 'roles'));
+        return view('users.create', compact('user', 'organizations', 'roles', 'designations', 'projects'));
     }
 
     /**
@@ -53,7 +57,9 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
             'organization_id' => ['nullable', 'exists:organizations,id'],
+            'designation_id' => ['nullable', 'exists:designations,id'],
             'roles' => ['required', 'array'],
+            'projects' => ['nullable', 'array'],
         ]);
 
         $user = User::create([
@@ -61,9 +67,12 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'organization_id' => $request->organization_id,
+            'designation_id' => $request->designation_id,
         ]);
 
-        $user->syncRoles($request->roles);
+        $roles = Role::whereIn('id', $request->roles)->get();
+        $user->syncRoles($roles);
+        $user->projects()->sync($request->projects);
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -86,8 +95,11 @@ class UserController extends Controller
         $organizations = Auth::user()->hasRole('Super Admin') ? Organization::all() : Organization::where('id', Auth::user()->organization_id)->get();
         $roles = Role::pluck('name', 'id');
         $userRoles = $user->roles->pluck('id')->toArray();
+        $designations = Designation::all();
+        $projects = Project::all();
+        $userProjects = $user->projects->pluck('id')->toArray();
 
-        return view('users.edit', compact('user', 'organizations', 'roles', 'userRoles'));
+        return view('users.edit', compact('user', 'organizations', 'roles', 'userRoles', 'designations', 'projects', 'userProjects'));
     }
 
     /**
@@ -102,17 +114,21 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'string', 'min:8'],
             'organization_id' => ['nullable', 'exists:organizations,id'],
+            'designation_id' => ['nullable', 'exists:designations,id'],
             'roles' => ['required', 'array'],
+            'projects' => ['nullable', 'array'],
         ]);
 
-        $userData = $request->only('name', 'email', 'organization_id');
+        $userData = $request->only('name', 'email', 'organization_id', 'designation_id');
         if ($request->filled('password')) {
             $userData['password'] = bcrypt($request->password);
         }
 
         $user->update($userData);
 
-        $user->syncRoles($request->roles);
+        $roles = Role::whereIn('id', $request->roles)->get();
+        $user->syncRoles($roles);
+        $user->projects()->sync($request->projects);
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }

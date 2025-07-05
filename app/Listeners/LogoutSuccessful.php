@@ -36,12 +36,15 @@ class LogoutSuccessful
         if ($attendance) {
             $attendance->check_out = now();
             $checkInTime = Carbon::parse($attendance->check_in);
-            $workedMinutes = (int) $checkInTime->diffInMinutes($attendance->check_out);
-            $attendance->worked_minutes = $workedMinutes;
+            
+            $durationInMinutes = (int) $checkInTime->diffInMinutes($attendance->check_out, true);
+            $durationInHours = $durationInMinutes / 60;
 
-            if ($workedMinutes >= 480) {
+            $attendance->worked_minutes = $durationInMinutes;
+
+            if ($durationInHours >= 8) {
                 $attendance->status = 'Full Day';
-            } elseif ($workedMinutes >= 240) {
+            } elseif ($durationInHours >= 4) {
                 $attendance->status = 'Half Day';
             } else {
                 $attendance->status = 'Incomplete';

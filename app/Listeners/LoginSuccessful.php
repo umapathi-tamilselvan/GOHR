@@ -35,6 +35,8 @@ class LoginSuccessful
             ],
             [
                 'check_in' => now(),
+                'status' => 'Incomplete',
+                'worked_minutes' => 0,
             ]
         );
     }

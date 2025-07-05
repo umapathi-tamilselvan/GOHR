@@ -6,9 +6,13 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Organization;
+use App\Models\Designation;
+use App\Models\Project;
 
 class User extends Authenticatable
 {
@@ -25,6 +29,7 @@ class User extends Authenticatable
         'email',
         'password',
         'organization_id',
+        'designation_id',
     ];
 
     /**
@@ -55,6 +60,21 @@ class User extends Authenticatable
         return $this->belongsTo(Organization::class);
     }
 
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    public function designation(): BelongsTo
+    {
+        return $this->belongsTo(Designation::class);
+    }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class);
+    }
+
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
@@ -63,6 +83,24 @@ class User extends Authenticatable
     public function getPermissionTeamId(): int | string | null
     {
         return $this->organization_id;
+    }
+
+    /**
+     * Get the user's primary role.
+     */
+    public function getPrimaryRoleAttribute(): string
+    {
+        $roles = $this->getRoleNames();
+        if ($roles->contains('Super Admin')) {
+            return 'Super Admin';
+        }
+        if ($roles->contains('HR')) {
+            return 'HR';
+        }
+        if ($roles->contains('Manager')) {
+            return 'Manager';
+        }
+        return 'Employee';
     }
 
     /**
