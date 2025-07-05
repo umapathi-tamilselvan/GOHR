@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
 class AttendanceController extends Controller
 {
@@ -23,21 +24,20 @@ class AttendanceController extends Controller
     {
         $this->authorize('viewAny', Attendance::class);
 
-        $user = Auth::user();
-        $query = Attendance::with('user.organization');
+        $attendances = Attendance::with('user.organization')
+            ->when($request->filled('start_date'), function ($query) use ($request) {
+                $query->where('date', '>=', $request->start_date);
+            })
+            ->when($request->filled('end_date'), function ($query) use ($request) {
+                $query->where('date', '<=', $request->end_date);
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('status', $request->status);
+            })
+            ->latest()
+            ->paginate(10);
 
-        if ($user->hasRole('HR') || $user->hasRole('Manager')) {
-            $organizationUsers = User::where('organization_id', $user->organization_id)->pluck('id');
-            $query->whereIn('user_id', $organizationUsers);
-        }
-
-        if ($request->has('date')) {
-            $query->where('date', $request->date);
-        }
-
-        $attendances = $query->latest()->paginate(10);
-
-        return view('attendance.list', compact('attendances'));
+        return view('attendances.list', compact('attendances'));
     }
 
     public function manage()

@@ -28,6 +28,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Gate::define('view_audit_log', function (User $user) {
+            return $user->hasRole('Super Admin');
+        });
     }
 } 

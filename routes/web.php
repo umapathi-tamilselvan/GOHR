@@ -5,12 +5,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AuditLogController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -19,15 +20,13 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('users', UserController::class);
 
-    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::get('/attendances', [AttendanceController::class, 'list'])->name('attendances.list');
-    Route::get('/attendance/manage', [AttendanceController::class, 'manage'])->name('attendance.manage');
-    Route::post('/attendance/manage', [AttendanceController::class, 'storeManual'])->name('attendance.store.manual');
-    Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
+    Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('attendances/list', [AttendanceController::class, 'list'])->name('attendances.list');
+    Route::get('attendances/report', [AttendanceController::class, 'report'])->name('attendances.report');
+    Route::get('attendances/manage', [AttendanceController::class, 'manage'])->name('attendances.manage');
+    Route::post('attendances/manage', [AttendanceController::class, 'storeManual'])->name('attendances.storeManual');
 
-    Route::middleware(['role:Super Admin'])->group(function () {
-        Route::get('/audit-log', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('audit-log.index');
-    });
+    Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 });
 
 require __DIR__.'/auth.php';

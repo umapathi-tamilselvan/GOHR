@@ -1,8 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('User Management') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('User Management') }}
+            </h2>
+            @can('create', App\Models\User::class)
+                <x-primary-button
+                    x-data=""
+                    x-on:click.prevent="$dispatch('open-modal', 'add-user-modal')"
+                >{{ __('Add User') }}</x-primary-button>
+            @endcan
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -14,65 +22,64 @@
             @endif
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <div class="flex justify-between mb-4">
-                        <h3 class="text-lg font-semibold">{{ __('Users') }}</h3>
-                        <a href="{{ route('users.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                            {{ __('Create User') }}
-                        </a>
-                    </div>
+                    <!-- Search Form -->
+                    <form action="{{ route('users.index') }}" method="GET" class="mb-6">
+                        <div class="flex items-center">
+                            <input type="text" name="search" placeholder="Search by name or email..." class="w-full px-4 py-2 border rounded-md" value="{{ request('search') }}">
+                            <button type="submit" class="ml-2 px-4 py-2 bg-gray-800 text-white rounded-md">Search</button>
+                        </div>
+                    </form>
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {{ __('Name') }}
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {{ __('Email') }}
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        {{ __('Organization') }}
-                                    </th>
-                                    <th scope="col" class="relative px-6 py-3">
-                                        <span class="sr-only">{{ __('Actions') }}</span>
-                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    @if(auth()->user()->hasRole('Super Admin'))
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                                    @endif
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ($users as $user)
+                                @forelse($users as $user)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                {{ $user->name }}
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->roles->pluck('name')->join(', ') }}</td>
+                                        @if(auth()->user()->hasRole('Super Admin'))
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ $user->organization->name ?? 'N/A' }}</td>
+                                        @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex items-center space-x-2">
+                                                @can('update', $user)
+                                                    <x-primary-button
+                                                        x-data=""
+                                                        x-on:click.prevent="$dispatch('open-modal', 'edit-user-modal-{{ $user->id }}')"
+                                                    >{{ __('Edit') }}</x-primary-button>
+                                                    @include('users.partials.edit-user-modal', ['user' => $user, 'organizations' => $organizations, 'roles' => $roles])
+                                                @endcan
+                                                @can('delete', $user)
+                                                    <x-danger-button
+                                                        x-data=""
+                                                        x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion-{{ $user->id }}')"
+                                                    >{{ __('Delete') }}</x-danger-button>
+                                                    @include('users.partials.delete-user-confirmation-modal', ['user' => $user])
+                                                @endcan
                                             </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-500">
-                                                {{ $user->email }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-500">
-                                                {{ $user->organization?->name ?? __('N/A') }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            @can('update', $user)
-                                            <a href="{{ route('users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
-                                            @endcan
-                                            @can('delete', $user)
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900 ml-2" onclick="return confirm('Are you sure?')">{{ __('Delete') }}</button>
-                                            </form>
-                                            @endcan
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="{{ auth()->user()->hasRole('Super Admin') ? 5 : 4 }}" class="px-6 py-4 text-center text-gray-500">No users found.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
                     <div class="mt-4">
                         {{ $users->links() }}
                     </div>
@@ -80,4 +87,6 @@
             </div>
         </div>
     </div>
+
+    @include('users.partials.add-user-modal', ['organizations' => $organizations, 'roles' => $roles])
 </x-app-layout> 
