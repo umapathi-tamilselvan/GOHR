@@ -20,11 +20,12 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('users', UserController::class);
 
-    Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
-    Route::get('attendances/list', [AttendanceController::class, 'list'])->name('attendances.list');
-    Route::get('attendances/report', [AttendanceController::class, 'report'])->name('attendances.report');
-    Route::get('attendances/manage', [AttendanceController::class, 'manage'])->name('attendances.manage');
-    Route::post('attendances/manage', [AttendanceController::class, 'storeManual'])->name('attendances.storeManual');
+    // Attendance routes - full resource routes plus custom routes
+    Route::resource('attendances', AttendanceController::class);
+    Route::get('attendances-list', [AttendanceController::class, 'list'])->name('attendances.list');
+    Route::get('attendances-report', [AttendanceController::class, 'report'])->name('attendances.report');
+    Route::get('attendances-manage', [AttendanceController::class, 'manage'])->name('attendances.manage');
+    Route::post('attendances-manual', [AttendanceController::class, 'storeManual'])->name('attendances.storeManual');
 
     Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
 });

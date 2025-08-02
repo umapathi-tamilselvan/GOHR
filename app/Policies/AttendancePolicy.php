@@ -21,8 +21,27 @@ class AttendancePolicy
      */
     public function view(User $user, Attendance $attendance): bool
     {
-        // TODO: Implement logic for viewing a single attendance record
-        return true;
+        // Users can view their own attendance
+        if ($user->id === $attendance->user_id) {
+            return true;
+        }
+
+        // Super Admin can view all attendance records
+        if ($user->hasRole('Super Admin')) {
+            return true;
+        }
+
+        // HR can view attendance for their organization
+        if ($user->hasRole('HR')) {
+            return $user->organization_id === $attendance->user->organization_id;
+        }
+
+        // Manager can view attendance for their organization
+        if ($user->hasRole('Manager')) {
+            return $user->organization_id === $attendance->user->organization_id;
+        }
+
+        return false;
     }
 
     /**

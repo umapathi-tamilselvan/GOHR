@@ -32,6 +32,33 @@ class UserController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(User $user)
+    {
+        $this->authorize('view', $user);
+
+        $user->load(['organization', 'roles', 'attendances' => function ($query) {
+            $query->latest()->take(10);
+        }]);
+
+        return view('users.show', compact('user'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(User $user)
+    {
+        $this->authorize('update', $user);
+
+        $organizations = Organization::all();
+        $roles = Role::all();
+
+        return view('users.edit', compact('user', 'organizations', 'roles'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
