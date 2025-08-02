@@ -27,6 +27,50 @@
             </x-nav-link>
         @endif
 
+        <!-- Leave Management -->
+        @can('viewAny', App\Models\Leave::class)
+            <div class="pt-4">
+                <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{{ __('Leave Management') }}</h3>
+                <div class="mt-2 space-y-1">
+                    <x-nav-link :href="route('leaves.index')" :active="request()->routeIs('leaves.index')" class="group">
+                        <div class="flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 {{ request()->routeIs('leaves.index') ? 'bg-emerald-50 text-emerald-700 border-r-2 border-emerald-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('leaves.index') ? 'text-emerald-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="font-medium">{{ __('Leave Requests') }}</span>
+                        </div>
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('leaves.calendar')" :active="request()->routeIs('leaves.calendar')" class="group">
+                        <div class="flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 {{ request()->routeIs('leaves.calendar') ? 'bg-cyan-50 text-cyan-700 border-r-2 border-cyan-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('leaves.calendar') ? 'text-cyan-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="font-medium">{{ __('Calendar View') }}</span>
+                        </div>
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('leave-balances.index')" :active="request()->routeIs('leave-balances.*')" class="group">
+                        <div class="flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 {{ request()->routeIs('leave-balances.*') ? 'bg-amber-50 text-amber-700 border-r-2 border-amber-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('leave-balances.*') ? 'text-amber-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+                            </svg>
+                            <span class="font-medium">{{ __('Leave Balances') }}</span>
+                        </div>
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('leaves.report')" :active="request()->routeIs('leaves.report')" class="group">
+                        <div class="flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 {{ request()->routeIs('leaves.report') ? 'bg-violet-50 text-violet-700 border-r-2 border-violet-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('leaves.report') ? 'text-violet-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            <span class="font-medium">{{ __('Leave Reports') }}</span>
+                        </div>
+                    </x-nav-link>
+                </div>
+            </div>
+        @endcan
+
         <!-- Attendance Management (HR/Manager) -->
         @can('viewAny', App\Models\Attendance::class)
             <div class="pt-4">
@@ -73,6 +117,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.184-1.268-.5-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.184-1.268.5-1.857m0 0a5.002 5.002 0 019 0m-4.5 4.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM12 12a5 5 0 100-10 5 5 0 000 10z"></path>
                             </svg>
                             <span class="font-medium">{{ __('Users') }}</span>
+                        </div>
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('employees.index')" :active="request()->routeIs('employees.*')" class="group">
+                        <div class="flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 {{ request()->routeIs('employees.*') ? 'bg-pink-50 text-pink-700 border-r-2 border-pink-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('employees.*') ? 'text-pink-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.184-1.268-.5-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.184-1.268.5-1.857m0 0a5.002 5.002 0 019 0m-4.5 4.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM12 12a5 5 0 100-10 5 5 0 000 10z"></path>
+                            </svg>
+                            <span class="font-medium">{{ __('Employees') }}</span>
                         </div>
                     </x-nav-link>
 

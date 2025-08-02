@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Leave;
+use App\Observers\LeaveObserver;
 use Illuminate\Auth\Events\Login;
 use App\Listeners\LoginSuccessful;
 use Illuminate\Auth\Events\Logout;
@@ -35,7 +37,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Leave::observe(LeaveObserver::class);
     }
 
     /**

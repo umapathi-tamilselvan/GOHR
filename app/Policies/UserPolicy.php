@@ -12,7 +12,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Super Admin', 'HR']);
+        return $user->hasPermissionTo('view users');
     }
 
     /**
@@ -20,6 +20,10 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
+        if (!$user->hasPermissionTo('view users')) {
+            return false;
+        }
+
         if ($user->hasRole('Super Admin')) {
             return true;
         }
@@ -36,7 +40,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['Super Admin', 'HR']);
+        return $user->hasPermissionTo('create users');
     }
 
     /**
@@ -44,6 +48,10 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
+        if (!$user->hasPermissionTo('edit users')) {
+            return false;
+        }
+
         if ($user->hasRole('Super Admin')) {
             return true;
         }
@@ -60,6 +68,10 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
+        if (!$user->hasPermissionTo('delete users')) {
+            return false;
+        }
+
         if ($user->hasRole('Super Admin')) {
             return true;
         }
@@ -76,7 +88,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->hasRole('Super Admin');
+        return $user->hasPermissionTo('delete users') && $user->hasRole('Super Admin');
     }
 
     /**
@@ -84,6 +96,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->hasRole('Super Admin');
+        return $user->hasPermissionTo('delete users') && $user->hasRole('Super Admin');
     }
 }

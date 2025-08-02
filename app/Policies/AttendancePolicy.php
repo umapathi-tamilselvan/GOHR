@@ -13,7 +13,7 @@ class AttendancePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Super Admin', 'HR', 'Manager']);
+        return $user->hasPermissionTo('view attendances');
     }
 
     /**
@@ -49,7 +49,7 @@ class AttendancePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['Super Admin', 'HR']);
+        return $user->hasPermissionTo('create attendances');
     }
 
     /**
@@ -57,6 +57,10 @@ class AttendancePolicy
      */
     public function update(User $user, Attendance $attendance): bool
     {
+        if (!$user->hasPermissionTo('edit attendances')) {
+            return false;
+        }
+        
         // Users can update their own attendance (check-out)
         // HR can update attendance for their organization
         return $user->id === $attendance->user_id || $user->hasRole('HR');
@@ -67,7 +71,7 @@ class AttendancePolicy
      */
     public function delete(User $user, Attendance $attendance): bool
     {
-        return $user->hasRole(['Super Admin', 'HR']);
+        return $user->hasPermissionTo('delete attendances');
     }
 
     /**

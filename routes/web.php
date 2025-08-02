@@ -8,6 +8,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTaskController;
+use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\LeaveTypeController;
+use App\Http\Controllers\LeaveBalanceController;
+use App\Http\Controllers\EmployeeController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,6 +45,35 @@ Route::middleware('auth')->group(function () {
     Route::patch('projects/{project}/tasks/{task}/assign', [ProjectTaskController::class, 'assign'])->name('projects.tasks.assign');
     Route::get('projects-report', [ProjectController::class, 'report'])->name('projects.report');
     Route::get('projects/{project}/tasks-report', [ProjectTaskController::class, 'report'])->name('projects.tasks.report');
+
+    // Leave Management routes
+    Route::resource('leaves', LeaveController::class);
+    Route::post('leaves/{leave}/approve', [LeaveController::class, 'approve'])->name('leaves.approve');
+    Route::post('leaves/{leave}/reject', [LeaveController::class, 'reject'])->name('leaves.reject');
+    Route::get('leaves-calendar', [LeaveController::class, 'calendar'])->name('leaves.calendar');
+    Route::get('leaves-report', [LeaveController::class, 'report'])->name('leaves.report');
+
+    // Leave Type routes
+    Route::resource('leave-types', LeaveTypeController::class);
+
+    // Leave Balance routes
+    Route::get('leave-balances', [LeaveBalanceController::class, 'index'])->name('leave-balances.index');
+    Route::get('leave-balances/{user}', [LeaveBalanceController::class, 'show'])->name('leave-balances.show');
+    Route::post('leave-balances/initialize', [LeaveBalanceController::class, 'initialize'])->name('leave-balances.initialize');
+    Route::patch('leave-balances/{leaveBalance}', [LeaveBalanceController::class, 'update'])->name('leave-balances.update');
+    Route::post('leave-balances/bulk-update', [LeaveBalanceController::class, 'bulkUpdate'])->name('leave-balances.bulk-update');
+    Route::get('leave-balances/export', [LeaveBalanceController::class, 'export'])->name('leave-balances.export');
+    
+    // API routes for leave balances
+    Route::get('api/leave-balances/{user}', [LeaveBalanceController::class, 'getUserBalances'])->name('api.leave-balances.user');
+
+    // Employee Management routes
+    Route::resource('employees', EmployeeController::class);
+    Route::get('employees-directory', [EmployeeController::class, 'directory'])->name('employees.directory');
+    Route::get('employees-onboarding', [EmployeeController::class, 'onboarding'])->name('employees.onboarding');
+    Route::post('employees/{employee}/documents', [EmployeeController::class, 'uploadDocument'])->name('employees.upload-document');
+    Route::delete('employees/{employee}/documents/{document}', [EmployeeController::class, 'deleteDocument'])->name('employees.delete-document');
+    Route::get('employees-report', [EmployeeController::class, 'report'])->name('employees.report');
 });
 
 require __DIR__.'/auth.php';
