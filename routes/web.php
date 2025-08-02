@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectTaskController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -28,6 +30,17 @@ Route::middleware('auth')->group(function () {
     Route::post('attendances-manual', [AttendanceController::class, 'storeManual'])->name('attendances.storeManual');
 
     Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
+
+    // Project Management routes
+    Route::resource('projects', ProjectController::class);
+    Route::post('projects/{project}/assign-manager', [ProjectController::class, 'assignManager'])->name('projects.assign-manager');
+    Route::post('projects/{project}/add-member', [ProjectController::class, 'addMember'])->name('projects.add-member');
+    Route::delete('projects/{project}/remove-member/{user}', [ProjectController::class, 'removeMember'])->name('projects.remove-member');
+    Route::resource('projects.tasks', ProjectTaskController::class);
+    Route::patch('projects/{project}/tasks/{task}/status', [ProjectTaskController::class, 'updateStatus'])->name('projects.tasks.update-status');
+    Route::patch('projects/{project}/tasks/{task}/assign', [ProjectTaskController::class, 'assign'])->name('projects.tasks.assign');
+    Route::get('projects-report', [ProjectController::class, 'report'])->name('projects.report');
+    Route::get('projects/{project}/tasks-report', [ProjectTaskController::class, 'report'])->name('projects.tasks.report');
 });
 
 require __DIR__.'/auth.php';

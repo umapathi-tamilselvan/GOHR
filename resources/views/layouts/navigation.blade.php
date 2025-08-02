@@ -75,6 +75,15 @@
                             <span class="font-medium">{{ __('Users') }}</span>
                         </div>
                     </x-nav-link>
+
+                    <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')" class="group">
+                        <div class="flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 {{ request()->routeIs('projects.*') ? 'bg-teal-50 text-teal-700 border-r-2 border-teal-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <svg class="w-5 h-5 {{ request()->routeIs('projects.*') ? 'text-teal-600' : 'text-gray-400 group-hover:text-gray-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                            <span class="font-medium">{{ __('Projects') }}</span>
+                        </div>
+                    </x-nav-link>
                 </div>
             </div>
         @endcan
