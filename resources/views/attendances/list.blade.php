@@ -59,7 +59,15 @@
                         @forelse($attendances as $attendance)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ $attendance->user->name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($attendance->date)->format('d M, Y') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @can('view', $attendance)
+                                        <a href="{{ route('attendances.show', $attendance) }}" class="text-blue-600 hover:text-blue-900 font-medium">
+                                            {{ \Carbon\Carbon::parse($attendance->date)->format('d M, Y') }}
+                                        </a>
+                                    @else
+                                        {{ \Carbon\Carbon::parse($attendance->date)->format('d M, Y') }}
+                                    @endcan
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$attendance->status] ?? 'bg-gray-100 text-gray-800' }}">
                                         {{ $attendance->status }}

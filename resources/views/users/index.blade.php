@@ -40,40 +40,30 @@
                                     @if(auth()->user()->hasRole('Super Admin'))
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
                                     @endif
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($users as $user)
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @can('view', $user)
+                                                <a href="{{ route('users.show', $user) }}" class="text-blue-600 hover:text-blue-900 font-medium">
+                                                    {{ $user->name }}
+                                                </a>
+                                            @else
+                                                {{ $user->name }}
+                                            @endcan
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">{{ $user->roles->pluck('name')->join(', ') }}</td>
                                         @if(auth()->user()->hasRole('Super Admin'))
                                             <td class="px-6 py-4 whitespace-nowrap">{{ $user->organization->name ?? 'N/A' }}</td>
                                         @endif
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex items-center space-x-2">
-                                                @can('update', $user)
-                                                    <x-primary-button
-                                                        x-data=""
-                                                        x-on:click.prevent="$dispatch('open-modal', 'edit-user-modal-{{ $user->id }}')"
-                                                    >{{ __('Edit') }}</x-primary-button>
-                                                    @include('users.partials.edit-user-modal', ['user' => $user, 'organizations' => $organizations, 'roles' => $roles])
-                                                @endcan
-                                                @can('delete', $user)
-                                                    <x-danger-button
-                                                        x-data=""
-                                                        x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion-{{ $user->id }}')"
-                                                    >{{ __('Delete') }}</x-danger-button>
-                                                    @include('users.partials.delete-user-confirmation-modal', ['user' => $user])
-                                                @endcan
-                                            </div>
-                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="{{ auth()->user()->hasRole('Super Admin') ? 5 : 4 }}" class="px-6 py-4 text-center text-gray-500">No users found.</td>
+                                        <td colspan="{{ auth()->user()->hasRole('Super Admin') ? 4 : 3 }}" class="px-6 py-4 text-center text-gray-500">No users found.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

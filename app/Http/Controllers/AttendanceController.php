@@ -40,6 +40,30 @@ class AttendanceController extends Controller
         return view('attendances.list', compact('attendances'));
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(Attendance $attendance)
+    {
+        $this->authorize('view', $attendance);
+
+        $attendance->load('user.organization');
+
+        return view('attendance.show', compact('attendance'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Attendance $attendance)
+    {
+        $this->authorize('update', $attendance);
+
+        $organizationUsers = User::where('organization_id', Auth::user()->organization_id)->get();
+
+        return view('attendance.edit', compact('attendance', 'organizationUsers'));
+    }
+
     public function manage()
     {
         $this->authorize('create', Attendance::class);
@@ -85,6 +109,55 @@ class AttendanceController extends Controller
         );
 
         return redirect()->route('attendances.list')->with('success', 'Attendance record saved successfully.');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Attendance $attendance)
+    {
+        $this->authorize('update', $attendance);
+
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'date' => 'required|date',
+            'check_in' => 'required|date_format:H:i',
+            'check_out' => 'nullable|date_format:H:i|after:check_in',
+        ]);
+
+        $checkIn = Carbon::parse($request->date . ' ' . $request->check_in);
+        $checkOut = $request->check_out ? Carbon::parse($request->date . ' ' . $request->check_out) : null;
+        $workedMinutes = $checkOut ? (int) $checkIn->diffInMinutes($checkOut) : 0;
+
+        $status = 'Incomplete';
+        if ($workedMinutes >= 480) {
+            $status = 'Full Day';
+        } elseif ($workedMinutes >= 240) {
+            $status = 'Half Day';
+        }
+
+        $attendance->update([
+            'user_id' => $request->user_id,
+            'date' => $request->date,
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'worked_minutes' => $workedMinutes,
+            'status' => $status,
+        ]);
+
+        return redirect()->route('attendances.list')->with('success', 'Attendance record updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Attendance $attendance)
+    {
+        $this->authorize('delete', $attendance);
+
+        $attendance->delete();
+
+        return redirect()->route('attendances.list')->with('success', 'Attendance record deleted successfully.');
     }
 
     public function report(Request $request)
