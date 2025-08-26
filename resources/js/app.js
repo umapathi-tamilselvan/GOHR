@@ -1,7 +1,29 @@
 import './bootstrap';
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import router from './router';
+import App from './App.vue';
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
 
-import Alpine from 'alpinejs';
+const app = createApp(App);
+const pinia = createPinia();
 
-window.Alpine = Alpine;
+app.use(pinia);
+app.use(router);
+app.use(Toast, {
+    position: 'top-right',
+    timeout: 5000,
+    closeOnClick: true,
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+    draggable: true,
+    draggablePercent: 0.6,
+    showCloseButtonOnHover: false,
+    hideProgressBar: false,
+    closeButton: 'button',
+    icon: true,
+    rtl: false
+});
 
-Alpine.start();
+app.mount('#app');

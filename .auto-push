@@ -1,0 +1,20 @@
+# GOHR Auto-Push Configuration
+# This file enables automatic pushing to remote repository after commits
+
+# Auto-push is ENABLED
+# Remove this file to disable auto-push
+
+# Configuration:
+# - Feature commits (feat:) will be auto-pushed
+# - Other commits will require manual push
+# - Set AUTO_PUSH=true environment variable to override
+
+# To disable auto-push:
+# 1. Remove this file, OR
+# 2. Set AUTO_PUSH=false environment variable
+
+# Auto-push rules:
+# - Only pushes feature commits automatically
+# - Requires clean working directory
+# - Will skip if remote is ahead
+# - Provides feedback on push status 
