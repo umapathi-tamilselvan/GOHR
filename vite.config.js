@@ -20,14 +20,15 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': '/resources/js',
+            '~': '/resources',
         },
     },
     build: {
         outDir: 'public/build',
         assetsDir: 'assets',
-        manifest: true,
-        rollupOptions: {
-            input: 'resources/js/app.js',
-        },
+        manifest: 'manifest.json',
+    },
+    optimizeDeps: {
+        include: ['vuetify'],
     },
 });

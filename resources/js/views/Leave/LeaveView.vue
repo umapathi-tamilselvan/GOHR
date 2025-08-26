@@ -91,7 +91,7 @@
           <div class="p-5">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <BanIcon class="h-6 w-6 text-gray-400" />
+                <XMarkIcon class="h-6 w-6 text-gray-400" />
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
@@ -270,7 +270,7 @@
                     
                     <button
                       v-if="leave.status === 'pending' && canApproveLeaves"
-                      @click="showRejectModal(leave)"
+                      @click="openRejectModal(leave)"
                       class="text-red-600 hover:text-red-900"
                     >
                       Reject
@@ -405,7 +405,7 @@ import {
   ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
-  BanIcon,
+  XMarkIcon,
 } from '@heroicons/vue/24/outline';
 
 // Components
@@ -540,7 +540,7 @@ const editLeave = (leave) => {
   showEditModal.value = true;
 };
 
-const showRejectModal = (leave) => {
+const openRejectModal = (leave) => {
   currentLeave.value = leave;
   showRejectModal.value = true;
 };

@@ -11,6 +11,8 @@ use App\Http\Controllers\API\AuditLogController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\LeaveTypeController;
 use App\Http\Controllers\API\LeaveBalanceController;
+use App\Http\Controllers\API\EmployeeController;
+use App\Http\Controllers\API\PayrollController;
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +111,37 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Leave balance summary (accessible to all authenticated users)
     Route::get('/leave-balances/summary', [LeaveBalanceController::class, 'userSummary']);
+    
+    // Employee management (restricted access)
+    Route::middleware('role:super-admin|hr')->group(function () {
+        Route::get('/employees', [EmployeeController::class, 'index']);
+        Route::post('/employees', [EmployeeController::class, 'store']);
+        Route::get('/employees/{employee}', [EmployeeController::class, 'show']);
+        Route::put('/employees/{employee}', [EmployeeController::class, 'update']);
+        Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy']);
+        Route::get('/employees/statistics', [EmployeeController::class, 'statistics']);
+        Route::get('/employees/{employee}/profile', [EmployeeController::class, 'profile']);
+        Route::put('/employees/{employee}/profile', [EmployeeController::class, 'updateProfile']);
+        Route::get('/employees/{employee}/documents', [EmployeeController::class, 'documents']);
+        Route::post('/employees/{employee}/documents', [EmployeeController::class, 'uploadDocument']);
+        Route::get('/employees/{employee}/family-members', [EmployeeController::class, 'familyMembers']);
+        Route::post('/employees/{employee}/family-members', [EmployeeController::class, 'addFamilyMember']);
+    });
+    
+    // Payroll management (restricted access)
+    Route::middleware('role:super-admin|hr|finance')->group(function () {
+        Route::get('/payrolls', [PayrollController::class, 'index']);
+        Route::post('/payrolls', [PayrollController::class, 'store']);
+        Route::get('/payrolls/{payroll}', [PayrollController::class, 'show']);
+        Route::put('/payrolls/{payroll}', [PayrollController::class, 'update']);
+        Route::delete('/payrolls/{payroll}', [PayrollController::class, 'destroy']);
+        Route::patch('/payrolls/{payroll}/approve', [PayrollController::class, 'approve']);
+        Route::patch('/payrolls/{payroll}/process', [PayrollController::class, 'process']);
+        Route::patch('/payrolls/{payroll}/mark-paid', [PayrollController::class, 'markAsPaid']);
+        Route::get('/payrolls/statistics', [PayrollController::class, 'statistics']);
+        Route::get('/payrolls/{payroll}/payslip', [PayrollController::class, 'generatePayslip']);
+        Route::post('/payrolls/bulk-operations', [PayrollController::class, 'bulkOperations']);
+    });
     
     // Organizations and Departments (accessible to all authenticated users)
     Route::get('/organizations', [UserController::class, 'organizations']);
